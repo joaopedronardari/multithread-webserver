@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
 import java.net.Socket;
 
 public class HttpRequest implements Runnable {
@@ -22,39 +25,32 @@ public class HttpRequest implements Runnable {
 	}
 
 	private void processRequest() throws Exception {
-		// TODO
 		// Obter uma referência para os trechos de entrada e saída do socket.
-
-		//InputStream is = ?;
-
-		//DataOutputStream os = ?;
-
+		InputStreamReader is = new InputStreamReader(socket.getInputStream());
+		DataOutputStream os = new DataOutputStream(socket.getOutputStream());
+        
 		// Ajustar os filtros do trecho de entrada.
-
 		// ?
-
-		// BufferedReader br = ?;
-
-		// TODO
-		
-		
+		BufferedReader br = new BufferedReader(is);
+        		
 		// Obter a linha de requisição da mensagem de requisição HTTP.
-		String requestLine = "?";
+		String requestLine = br.readLine();
+		
 		// Exibir a linha de requisição.
 		System.out.println();
 		System.out.println(requestLine);
 		
 		// Obter e exibir as linhas de cabeçalho.
-
 		String headerLine = null;
-
-		/*while ((headerLine = br.readLine()).length() != 0) {
+		while ((headerLine = br.readLine()).length() != 0) {
 			System.out.println(headerLine);
-		}*/
+		}
 		
+        os.writeBytes("Respondendo qualquer coisa :P");
+        
 		// Fechando tudo e socket...
-		//os.close();
-		//br.close();
-		//socket.close();
+		os.close();
+		br.close();
+		socket.close();
 	}
 }
