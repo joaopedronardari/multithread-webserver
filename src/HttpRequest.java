@@ -87,14 +87,14 @@ public class HttpRequest implements Runnable {
 		String contentTypeLine = null;
 		String entityBody = null;
 		if (fileExists) {
-			statusLine = "HTTP/1.1 200 OK";
+			statusLine = "HTTP/1.1 200 OK" + CRLF;
 			contentTypeLine = "Content-Type: " + contentType( fileName ) + CRLF;
 		} else {
-			statusLine = "HTTP/1.1 404 Not Found";
-			contentTypeLine = "text/html";
+			statusLine = "HTTP/1.1 404 Not Found" + CRLF;
+			contentTypeLine = "text/html" + CRLF;
 			entityBody = "<HTML>" +
-				"<HEAD><TITTLE>Not Found</TITTLE></HEAD>" +
-				"<BODY>Not Found</BODY></HTML>";
+				"<HEAD><TITLE>Not Found</TITLE></HEAD>" +
+				"<BODY>Not Found</BODY></HTML>" + CRLF;
 		}
         
 		// Enviar a linha de status.
