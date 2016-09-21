@@ -18,7 +18,7 @@ public class HttpRequest implements Runnable {
 		this.socket = socket;
 	}
 
-	// Implemente o método run() da interface Runnable.
+	// Implemente o metodo run() da interface Runnable.
 	@Override
 	public void run() {
 		try {
@@ -48,7 +48,7 @@ public class HttpRequest implements Runnable {
 		// Construir um buffer de 1K para comportar os bytes no caminho para o socket.
 		byte[] buffer = new byte[1024];
 		int bytes = 0;
-		// Copiar o arquivo requisitado dentro da cadeia de saída do socket.
+		// Copiar o arquivo requisitado dentro da cadeia de saida do socket.
 		while((bytes = fis.read(buffer)) != -1 ) {
 			os.write(buffer, 0, bytes);
 		}
@@ -56,21 +56,21 @@ public class HttpRequest implements Runnable {
 
 
 	private void processRequest() throws Exception {
-		// Obter uma referência para os trechos de entrada e saída do socket.
+		// Obter uma referencia para os trechos de entrada e saida do socket.
 		InputStreamReader is = new InputStreamReader(socket.getInputStream());
 		DataOutputStream os = new DataOutputStream(socket.getOutputStream());
         
 		// Ajustar os filtros do trecho de entrada.
 		BufferedReader br = new BufferedReader(is);
         		
-		// Obter a linha de requisição da mensagem de requisição HTTP.
+		// Obter a linha de requisicao da mensagem de requisicao HTTP.
 		String requestLine = br.readLine();
 		
-		// Extrair o nome do arquivo a linha de requisição.
+		// Extrair o nome do arquivo a linha de requisicao.
 		StringTokenizer tokens = new StringTokenizer(requestLine);
 		tokens.nextToken(); // pular o metodo, que deve ser GET
 		String fileName = tokens.nextToken();
-		// Acrescente um . de modo que a requisição do arquivo esteja dentro do diretorio atual.
+		// Acrescente um . de modo que a requisicao do arquivo esteja dentro do diretorio atual.
 		fileName = "." + fileName;
 		
 		// Abrir o arquivo requisitado.
@@ -101,7 +101,7 @@ public class HttpRequest implements Runnable {
 		os.writeBytes(statusLine);
 		// Enviar a linha de tipo de conteudo.
 		os.writeBytes(contentTypeLine);
-		// Enviar uma linha em branco para indicar o fim das linhas de cabeçalho.
+		// Enviar uma linha em branco para indicar o fim das linhas de cabecalho.
 		os.writeBytes(CRLF);
 		
 		// Enviar o corpo da entidade.
@@ -112,7 +112,7 @@ public class HttpRequest implements Runnable {
 			os.writeBytes(entityBody);
 		}
         
-        // Obter e exibir as linhas de cabeçalho.
+        // Obter e exibir as linhas de cabecalho.
  		String headerLine = null;
  		while ((headerLine = br.readLine()).length() != 0) {
  			System.out.println(headerLine);
