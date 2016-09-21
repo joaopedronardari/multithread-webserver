@@ -5,8 +5,12 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.FileNotFoundException;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.StringTokenizer;
 
+/**
+ * Classe que representa a requisicao HTTP
+ */
 public class HttpRequest implements Runnable {
 	
 	final static String CRLF = "\r\n";
@@ -56,6 +60,9 @@ public class HttpRequest implements Runnable {
 
 
 	private void processRequest() throws Exception {
+		
+		int bytesSize = socket.getInputStream().available();
+		
 		// Obter uma referencia para os trechos de entrada e saida do socket.
 		InputStreamReader is = new InputStreamReader(socket.getInputStream());
 		DataOutputStream os = new DataOutputStream(socket.getOutputStream());
@@ -111,6 +118,12 @@ public class HttpRequest implements Runnable {
 		} else {
 			os.writeBytes(entityBody);
 		}
+		
+		// Captura endereco de quem fez a requisicao
+		SocketAddress address = socket.getRemoteSocketAddress();
+		
+		// Log de requisicao
+		Log.persistLogOperation(address.toString(), fileName, bytesSize);
         
         // Obter e exibir as linhas de cabecalho.
  		String headerLine = null;
