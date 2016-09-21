@@ -14,9 +14,9 @@ public class WebServer {
 		while (true) {
 			Socket connectionSocket = socket.accept();
             
-			// Escutar requisicao de conexão TCP.
+			// Escutar requisicao de conexao TCP.
 			
-			/** Quando receber requisição **/
+			/** Quando receber requisicao **/
 			//Construir um objeto para processar a mensagem de requisicao HTTP.
 			HttpRequest request = new HttpRequest(connectionSocket);
 
