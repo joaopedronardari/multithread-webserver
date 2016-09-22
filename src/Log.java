@@ -1,3 +1,5 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Calendar;
@@ -55,8 +57,13 @@ public class Log {
 	 * Metodo que retorna todo o log
 	 * @return String do log
 	 */
-	public static String getAllLog() {
-		return "";
+	public static FileInputStream getAllLog() {
+		try {
+			return new FileInputStream(fileName);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 }

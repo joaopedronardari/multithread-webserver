@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.FileNotFoundException;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -61,7 +62,7 @@ public class HttpRequest implements Runnable {
 
 	private void processRequest() throws Exception {
 		
-		int bytesSize = socket.getInputStream().available();
+		int bytesSize = socket.getInputStream().available();        
 		
 		// Obter uma referencia para os trechos de entrada e saida do socket.
 		InputStreamReader is = new InputStreamReader(socket.getInputStream());
@@ -77,8 +78,17 @@ public class HttpRequest implements Runnable {
 		StringTokenizer tokens = new StringTokenizer(requestLine);
 		tokens.nextToken(); // pular o metodo, que deve ser GET
 		String fileName = tokens.nextToken();
+		
+		System.out.println(fileName);
+		
 		// Acrescente um . de modo que a requisicao do arquivo esteja dentro do diretorio atual.
 		fileName = "." + fileName;
+		
+		// Captura endereco de quem fez a requisicao
+		SocketAddress address = socket.getRemoteSocketAddress();
+					
+		// Log de requisicao
+		Log.persistLogOperation(address.toString(), fileName, bytesSize);		
 		
 		// Abrir o arquivo requisitado.
 		FileInputStream fis = null;
@@ -96,6 +106,23 @@ public class HttpRequest implements Runnable {
 		if (fileExists) {
 			statusLine = "HTTP/1.1 200 OK" + CRLF;
 			contentTypeLine = "Content-Type: " + contentType( fileName ) + CRLF;
+		} else if (fileName.equals("./diretorio")) {
+			// FIXME - fiz uma versao paliativa so p testar...
+			statusLine = "HTTP/1.1 200 OK" + CRLF;
+			contentTypeLine = "Content-Type: text/html" + CRLF;
+			entityBody = "<HTML>" +
+				"<HEAD><TITLE>Diretorios</TITLE></HEAD>" +
+				"<BODY>";
+			
+			List<String> paths = WebServer.listFilesAndDirectories();
+			
+			for (String path : paths) {
+				entityBody += path + "<BR/>";
+			}
+			
+			entityBody += "</BODY></HTML>" + CRLF;
+				
+			
 		} else {
 			statusLine = "HTTP/1.1 404 Not Found" + CRLF;
 			contentTypeLine = "Content-Type: text/html" + CRLF;
@@ -119,12 +146,6 @@ public class HttpRequest implements Runnable {
 			os.writeBytes(entityBody);
 		}
 		
-		// Captura endereco de quem fez a requisicao
-		SocketAddress address = socket.getRemoteSocketAddress();
-		
-		// Log de requisicao
-		Log.persistLogOperation(address.toString(), fileName, bytesSize);
-        
         // Obter e exibir as linhas de cabecalho.
  		String headerLine = null;
  		while ((headerLine = br.readLine()).length() != 0) {

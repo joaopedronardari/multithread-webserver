@@ -1,5 +1,8 @@
+import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WebServer {
 	public static void main(String[] args) throws Exception {
@@ -28,5 +31,26 @@ public class WebServer {
 		}
 		
 		
+	}
+	
+	/**
+	 * Metodo para auxiliar listagem de arquivos 
+	 * e diretorios do servidor
+	 * @return lista de arquivos e diretorios da raiz do servidor
+	 */
+	public static List<String> listFilesAndDirectories() {
+		File folder = new File("./");
+		File[] listOfFiles = folder.listFiles();
+		List<String> paths = new ArrayList<String>();
+
+	    for (int i = 0; i < listOfFiles.length; i++) {
+	      if (listOfFiles[i].isFile()) {
+	    	paths.add(listOfFiles[i].getName());
+	      } else if (listOfFiles[i].isDirectory()) {
+	    	paths.add(listOfFiles[i].getName());
+	      }
+	    }
+	    
+	    return paths;
 	}
 }
