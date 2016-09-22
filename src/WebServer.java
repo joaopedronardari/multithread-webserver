@@ -38,8 +38,8 @@ public class WebServer {
 	 * e diretorios do servidor
 	 * @return lista de arquivos e diretorios da raiz do servidor
 	 */
-	public static List<String> listFilesAndDirectories() {
-		File folder = new File("./");
+	public static List<String> listFilesAndDirectories(String diretorio) {
+		File folder = new File(diretorio);
 		File[] listOfFiles = folder.listFiles();
 		List<String> paths = new ArrayList<String>();
 
@@ -47,7 +47,7 @@ public class WebServer {
 	      if (listOfFiles[i].isFile()) {
 	    	paths.add(listOfFiles[i].getName());
 	      } else if (listOfFiles[i].isDirectory()) {
-	    	paths.add(listOfFiles[i].getName());
+	    	paths.add(listOfFiles[i].getName() + "/");
 	      }
 	    }
 	    

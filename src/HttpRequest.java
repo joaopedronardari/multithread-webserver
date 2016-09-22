@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.OutputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -106,29 +107,31 @@ public class HttpRequest implements Runnable {
 		if (fileExists) {
 			statusLine = "HTTP/1.1 200 OK" + CRLF;
 			contentTypeLine = "Content-Type: " + contentType( fileName ) + CRLF;
-		} else if (fileName.equals("./diretorio")) {
-			// FIXME - fiz uma versao paliativa so p testar...
-			statusLine = "HTTP/1.1 200 OK" + CRLF;
-			contentTypeLine = "Content-Type: text/html" + CRLF;
-			entityBody = "<HTML>" +
-				"<HEAD><TITLE>Diretorios</TITLE></HEAD>" +
-				"<BODY>";
-			
-			List<String> paths = WebServer.listFilesAndDirectories();
-			
-			for (String path : paths) {
-				entityBody += path + "<BR/>";
-			}
-			
-			entityBody += "</BODY></HTML>" + CRLF;
-				
-			
 		} else {
-			statusLine = "HTTP/1.1 404 Not Found" + CRLF;
-			contentTypeLine = "Content-Type: text/html" + CRLF;
-			entityBody = "<HTML>" +
-				"<HEAD><TITLE>Not Found</TITLE></HEAD>" +
-				"<BODY>Not Found</BODY></HTML>" + CRLF;
+			File f = new File(fileName);
+			if (f.exists() && f.isDirectory()) {
+				// FIXME - fiz uma versao paliativa so p testar...
+				statusLine = "HTTP/1.1 200 OK" + CRLF;
+				contentTypeLine = "Content-Type: text/html" + CRLF;
+				entityBody = "<HTML>" +
+					"<HEAD><TITLE>"+fileName+"</TITLE></HEAD>" +
+					"<BODY>";
+				
+				List<String> paths = WebServer.listFilesAndDirectories(fileName);
+				
+				for (String path : paths) {
+					entityBody += path + "<BR/>";
+				}
+				
+				entityBody += "</BODY></HTML>" + CRLF;
+				
+			} else {
+				statusLine = "HTTP/1.1 404 Not Found" + CRLF;
+				contentTypeLine = "Content-Type: text/html" + CRLF;
+				entityBody = "<HTML>" +
+					"<HEAD><TITLE>Not Found</TITLE></HEAD>" +
+					"<BODY>Not Found</BODY></HTML>" + CRLF;
+			}
 		}
         
 		// Enviar a linha de status.

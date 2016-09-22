@@ -18,3 +18,6 @@
 |0:7:30|from /0:0:0:0:0:0:0:1:62724|content: ./diretorios|   0 bytes|
 |0:8:17|from /0:0:0:0:0:0:0:1:62739|content: ./diretorio/| 449 bytes|
 |0:8:19|from /0:0:0:0:0:0:0:1:62740|content: ./diretorio|   0 bytes|
+|18:27:18|from /127.0.0.1:54676|content:  ./| 389 bytes|
+|18:27:18|from /127.0.0.1:54677|content: ./favicon.ico| 332 bytes|
+|18:27:25|from /127.0.0.1:54790|content: ./src| 392 bytes|
