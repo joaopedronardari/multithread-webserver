@@ -120,7 +120,7 @@ public class HttpRequest implements Runnable {
 				List<String> paths = WebServer.listFilesAndDirectories(fileName);
 				
 				for (String path : paths) {
-					entityBody += path + "<BR/>";
+					entityBody += "<a href='"+ path +"'>"+ path + "</a><BR/>";
 				}
 				
 				entityBody += "</BODY></HTML>" + CRLF;
