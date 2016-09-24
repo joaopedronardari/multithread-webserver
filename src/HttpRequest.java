@@ -89,7 +89,26 @@ public class HttpRequest implements Runnable {
 		SocketAddress address = socket.getRemoteSocketAddress();
 					
 		// Log de requisicao
-		Log.persistLogOperation(address.toString(), fileName, bytesSize);		
+		Log.persistLogOperation(address.toString(), fileName, bytesSize);
+		
+		// Obter e exibir as linhas de cabecalho.
+		String authToken = "";
+ 		String headerLine = null;
+ 		while ((headerLine = br.readLine()).length() != 0) {
+ 			
+ 			//Extrai token de autenticacao
+ 			if(headerLine.startsWith("Authorization: Basic "))
+ 			{
+ 				String[] temp = headerLine.split("Basic ");
+ 				if(temp.length == 2)
+ 				{
+ 					authToken = temp[1];
+ 					System.out.println(authToken);
+ 				}
+ 			}
+ 			
+ 			System.out.println(headerLine);
+ 		}
 		
 		// Construir a mensagem de resposta.
 		String statusLine = null;
@@ -97,34 +116,52 @@ public class HttpRequest implements Runnable {
 		String entityBody = null;
 		
 		//Checagem de diretorio
-		Boolean isDirectory = false;
+		Boolean isDirectory = true;
 		File f = new File(fileName);
 		if (f.exists() && f.isDirectory()) {
-			if(WebServer.shouldListDirectoryContent == 3 ){
-				fileName += "/index.html";
+			
+			//Autenticacao
+			boolean authorized = true;
+			if(WebServer.dirIsRestricted(fileName))
+			{
+				authorized = WebServer.authenticate(authToken);
 			}
-			else{
-				// FIXME - fiz uma versao paliativa so p testar...
-				statusLine = "HTTP/1.1 200 OK" + CRLF;
-				contentTypeLine = "Content-Type: text/html" + CRLF;
-				entityBody = "<HTML>" +
-					"<HEAD><TITLE>"+fileName+"</TITLE></HEAD>" +
-					"<BODY>";
-				
-				if( WebServer.shouldListDirectoryContent == 1 )
-				{
-					List<String> paths = WebServer.listFilesAndDirectories(fileName);
-					
-					for (String path : paths) {
-						entityBody += "<a href='"+ path +"'>"+ path + "</a><BR/>";
-					}
+			
+			if(authorized) {
+				if(WebServer.shouldListDirectoryContent == 3 ){
+					fileName += "/index.html";
 				}
 				else{
-					entityBody += "<h1>Listagem de diretorio nao permitida</h1>";
+					// FIXME - fiz uma versao paliativa so p testar...
+					statusLine = "HTTP/1.1 200 OK" + CRLF;
+					contentTypeLine = "Content-Type: text/html" + CRLF;
+					entityBody = "<HTML>" +
+						"<HEAD><TITLE>"+fileName+"</TITLE></HEAD>" +
+						"<BODY>";
+					
+					if( WebServer.shouldListDirectoryContent == 1 )
+					{
+						List<String> paths = WebServer.listFilesAndDirectories(fileName);
+						
+						for (String path : paths) {
+							entityBody += "<a href='"+ path +"'>"+ path + "</a><BR/>";
+						}
+					}
+					else{
+						entityBody += "<h1>Listagem de diretorio nao permitida</h1>";
+					}
+					
+					entityBody += "</BODY></HTML>" + CRLF;
+					
+					isDirectory = true;
 				}
-				
-				entityBody += "</BODY></HTML>" + CRLF;
-				
+			}
+			else	
+			{
+				statusLine = "HTTP 401 Unauthorized status" + CRLF;
+				statusLine += "WWW-Authenticate: Basic realm=\"User Visible Realm\"" + CRLF;
+				contentTypeLine = "";
+				entityBody = "";
 				isDirectory = true;
 			}
 		}
@@ -164,12 +201,7 @@ public class HttpRequest implements Runnable {
 		} else {
 			os.writeBytes(entityBody);
 		}
-		
-        // Obter e exibir as linhas de cabecalho.
- 		String headerLine = null;
- 		while ((headerLine = br.readLine()).length() != 0) {
- 			System.out.println(headerLine);
- 		}
+        
         
 		// Fechando tudo e socket...
 		os.close();

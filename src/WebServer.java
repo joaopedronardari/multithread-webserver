@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Base64;
 
 public class WebServer {
 	static String configFile = "webserver.cfg";
@@ -103,6 +104,7 @@ public class WebServer {
 						break;
 					case "restricted_directory":
 						restrictedDirectories.add(values[1]);
+						System.out.println("Adding: " + values[1]);
 						break;
 					default:
 						System.out.println("Comando inválido! " + values[0]);
@@ -116,5 +118,27 @@ public class WebServer {
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo de configuração não encontrado!");
 		}
+	}
+	
+	/**
+	 * Verifica se diretorio e restrito
+	 * @return diretorio e restrito?
+	 */
+	public static boolean dirIsRestricted(String filename)
+	{
+		System.out.println("Testing: " + filename);
+		return restrictedDirectories.contains(filename);
+	}
+	
+	/**
+	 * Verifica login e senha do usuario
+	 * @return usuario foi autorizado?
+	 */
+	public static boolean authenticate(String token)
+	{
+		Base64.Encoder encoder = Base64.getEncoder();
+		String serverString = authUser+":"+authPassword;
+		String serverToken = encoder.encodeToString(serverString.getBytes());
+		return serverToken.compareTo(token) == 0;
 	}
 }
