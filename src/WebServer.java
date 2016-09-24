@@ -52,7 +52,7 @@ public class WebServer {
 	 * @return List<String> lista de arquivos e diretorios do caminho passado
 	 */
 	public static List<String> listFilesAndDirectories(String directoryPath) {
-		File folder = new File(diretorio);
+		File folder = new File(directoryPath);
 		File[] listOfFiles = folder.listFiles();
 		List<String> paths = new ArrayList<String>();
 
