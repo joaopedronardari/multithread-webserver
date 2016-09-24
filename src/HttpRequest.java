@@ -116,7 +116,7 @@ public class HttpRequest implements Runnable {
 		String entityBody = null;
 		
 		//Checagem de diretorio
-		Boolean isDirectory = true;
+		Boolean isDirectory = false;
 		File f = new File(fileName);
 		if (f.exists() && f.isDirectory()) {
 			
