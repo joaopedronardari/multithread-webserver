@@ -91,25 +91,19 @@ public class HttpRequest implements Runnable {
 		// Log de requisicao
 		Log.persistLogOperation(address.toString(), fileName, bytesSize);		
 		
-		// Abrir o arquivo requisitado.
-		FileInputStream fis = null;
-		Boolean fileExists = true;
-		try {
-			fis = new FileInputStream(fileName);
-		} catch (FileNotFoundException e) {
-			fileExists = false;
-		}
-		
 		// Construir a mensagem de resposta.
 		String statusLine = null;
 		String contentTypeLine = null;
 		String entityBody = null;
-		if (fileExists) {
-			statusLine = "HTTP/1.1 200 OK" + CRLF;
-			contentTypeLine = "Content-Type: " + contentType( fileName ) + CRLF;
-		} else {
-			File f = new File(fileName);
-			if (f.exists() && f.isDirectory()) {
+		
+		//Checagem de diretorio
+		Boolean isDirectory = false;
+		File f = new File(fileName);
+		if (f.exists() && f.isDirectory()) {
+			if(WebServer.shouldListDirectoryContent == 3 ){
+				fileName += "/index.html";
+			}
+			else{
 				// FIXME - fiz uma versao paliativa so p testar...
 				statusLine = "HTTP/1.1 200 OK" + CRLF;
 				contentTypeLine = "Content-Type: text/html" + CRLF;
@@ -117,20 +111,42 @@ public class HttpRequest implements Runnable {
 					"<HEAD><TITLE>"+fileName+"</TITLE></HEAD>" +
 					"<BODY>";
 				
-				List<String> paths = WebServer.listFilesAndDirectories(fileName);
-				
-				for (String path : paths) {
-					entityBody += "<a href='"+ path +"'>"+ path + "</a><BR/>";
+				if( WebServer.shouldListDirectoryContent == 1 )
+				{
+					List<String> paths = WebServer.listFilesAndDirectories(fileName);
+					
+					for (String path : paths) {
+						entityBody += "<a href='"+ path +"'>"+ path + "</a><BR/>";
+					}
+				}
+				else{
+					entityBody += "<h1>Listagem de diretorio nao permitida</h1>";
 				}
 				
 				entityBody += "</BODY></HTML>" + CRLF;
 				
-			} else {
+				isDirectory = true;
+			}
+		}
+		
+		
+		// Abrir o arquivo requisitado.
+		FileInputStream fis = null;
+		Boolean fileExists = false;
+		if (!isDirectory) {
+			try{
+				fis = new FileInputStream(fileName);
+				statusLine = "HTTP/1.1 200 OK" + CRLF;
+				contentTypeLine = "Content-Type: " + contentType( fileName ) + CRLF;
+				fileExists = true;
+			}
+			catch (FileNotFoundException e) {
 				statusLine = "HTTP/1.1 404 Not Found" + CRLF;
 				contentTypeLine = "Content-Type: text/html" + CRLF;
 				entityBody = "<HTML>" +
 					"<HEAD><TITLE>Not Found</TITLE></HEAD>" +
 					"<BODY>Not Found</BODY></HTML>" + CRLF;
+				fileExists = false;
 			}
 		}
         

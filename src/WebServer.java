@@ -1,10 +1,20 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class WebServer {
+	static String configFile = "webserver.cfg";
+	
+	//Configurações do WebServer
+	public static int shouldListDirectoryContent;
+	static String authUser;
+	static String authPassword;
+	static ArrayList<String> restrictedDirectories;
+	
 	public static void main(String[] args) throws Exception {
 		
 		// Ajustar o numero da porta.
@@ -12,6 +22,9 @@ public class WebServer {
 		
 		// Estabelecer o socket de escuta.
 		ServerSocket socket = new ServerSocket(port);
+		
+		// Lê arquivo de configuracao
+		readConfigFile();
 
 		// Processar a requisicao de servico HTTP em um laco infinito.
 		while (true) {
@@ -29,8 +42,6 @@ public class WebServer {
 			//Iniciar o thread.
 			thread.start();
 		}
-		
-		
 	}
 	
 	/**
@@ -52,5 +63,58 @@ public class WebServer {
 	    }
 	    
 	    return paths;
+	}
+	
+	/**
+	 * Metodo para fazer parsing do arquivo de configuracao
+	 */
+	static void readConfigFile(){
+		File cfg = new File(configFile);
+		
+		//Seta valores padrao
+		shouldListDirectoryContent = 3;
+		authUser = "";
+		authPassword = "";
+		restrictedDirectories = new ArrayList<String>();
+		
+		try {
+			Scanner in = new Scanner(cfg);
+			while(in.hasNext()){
+				String line = in.nextLine();
+				
+				//Pula comentários
+				if(line.startsWith("#"))
+					continue;
+				
+				//Faz parsing da linha
+				String values[] = line.split(":");
+				if(values.length == 2)
+				{
+					switch(values[0])
+					{
+					case "list_directory_content":
+						shouldListDirectoryContent = Integer.parseInt(values[1]);
+						break;
+					case "auth_username":
+						authUser = values[1];
+						break;
+					case "auth_password":
+						authPassword = values[1];
+						break;
+					case "restricted_directory":
+						restrictedDirectories.add(values[1]);
+						break;
+					default:
+						System.out.println("Comando inválido! " + values[0]);
+					}
+				} else
+				{
+					System.out.println("Linha inválida de configuração! " + line);
+				}	
+			}
+			
+		} catch (FileNotFoundException e) {
+			System.out.println("Arquivo de configuração não encontrado!");
+		}
 	}
 }
