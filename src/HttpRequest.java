@@ -63,8 +63,6 @@ public class HttpRequest implements Runnable {
 
 	private void processRequest() throws Exception {
 		
-		int bytesSize = socket.getInputStream().available();        
-		
 		// Obter uma referencia para os trechos de entrada e saida do socket.
 		InputStreamReader is = new InputStreamReader(socket.getInputStream());
 		DataOutputStream os = new DataOutputStream(socket.getOutputStream());
@@ -84,12 +82,6 @@ public class HttpRequest implements Runnable {
 		
 		// Acrescente um . de modo que a requisicao do arquivo esteja dentro do diretorio atual.
 		fileName = "." + fileName;
-		
-		// Captura endereco de quem fez a requisicao
-		SocketAddress address = socket.getRemoteSocketAddress();
-					
-		// Log de requisicao
-		Log.persistLogOperation(address.toString(), fileName, bytesSize);
 		
 		// Obter e exibir as linhas de cabecalho.
 		String authToken = "";
@@ -202,6 +194,14 @@ public class HttpRequest implements Runnable {
 			os.writeBytes(entityBody);
 		}
         
+		// Pega quantos bytes de resposta
+		int bytesSize = os.size();
+		
+		// Captura endereco de quem fez a requisicao
+		SocketAddress address = socket.getRemoteSocketAddress();
+							
+		// Persiste no Log
+		Log.persistLogOperation(address.toString(), fileName, bytesSize);
         
 		// Fechando tudo e socket...
 		os.close();

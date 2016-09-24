@@ -46,12 +46,13 @@ public class WebServer {
 	}
 	
 	/**
-	 * Metodo para auxiliar listagem de arquivos 
+	 * Metodo para listagem de arquivos 
 	 * e diretorios do servidor
-	 * @return lista de arquivos e diretorios da raiz do servidor
+	 * @param directoryPath - caminho do diretorio para listagem
+	 * @return List<String> lista de arquivos e diretorios do caminho passado
 	 */
-	public static List<String> listFilesAndDirectories(String diretorio) {
-		File folder = new File(diretorio);
+	public static List<String> listFilesAndDirectories(String directoryPath) {
+		File folder = new File(directoryPath);
 		File[] listOfFiles = folder.listFiles();
 		List<String> paths = new ArrayList<String>();
 

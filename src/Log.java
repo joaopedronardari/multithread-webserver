@@ -50,20 +50,9 @@ public class Log {
 	 */
 	private static String getServerHour() {
 		Calendar calendar = Calendar.getInstance();
-		return calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND);
+		return String.format("%02d:%02d:%02d",calendar.get(Calendar.HOUR_OF_DAY),
+				calendar.get(Calendar.MINUTE),
+				calendar.get(Calendar.SECOND));
 	}
-	
-	/**
-	 * Metodo que retorna todo o log
-	 * @return String do log
-	 */
-	public static FileInputStream getAllLog() {
-		try {
-			return new FileInputStream(fileName);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
+
 }
