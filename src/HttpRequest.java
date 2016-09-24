@@ -107,53 +107,51 @@ public class HttpRequest implements Runnable {
 		String contentTypeLine = null;
 		String entityBody = null;
 		
-		//Checagem de diretorio
-		Boolean isDirectory = false;
-		File f = new File(fileName);
-		if (f.exists() && f.isDirectory()) {
-			
-			//Autenticacao
-			boolean authorized = true;
-			if(WebServer.dirIsRestricted(fileName))
-			{
-				authorized = WebServer.authenticate(authToken);
-			}
-			
-			if(authorized) {
-				if(WebServer.shouldListDirectoryContent == 3 ){
-					fileName += "/index.html";
-				}
-				else{
-					// FIXME - fiz uma versao paliativa so p testar...
-					statusLine = "HTTP/1.1 200 OK" + CRLF;
-					contentTypeLine = "Content-Type: text/html" + CRLF;
-					entityBody = "<HTML>" +
-						"<HEAD><TITLE>"+fileName+"</TITLE></HEAD>" +
-						"<BODY>";
-					
-					if( WebServer.shouldListDirectoryContent == 1 )
-					{
-						List<String> paths = WebServer.listFilesAndDirectories(fileName);
-						
-						for (String path : paths) {
-							entityBody += "<a href='"+ path +"'>"+ path + "</a><BR/>";
-						}
-					}
-					else{
-						entityBody += "<h1>Listagem de diretorio nao permitida</h1>";
-					}
-					
-					entityBody += "</BODY></HTML>" + CRLF;
-					
-					isDirectory = true;
-				}
-			}
-			else	
+		
+		//Autenticacao
+		boolean authorized = true;
+		if(WebServer.isRestricted(fileName))
+		{
+			authorized = WebServer.authenticate(authToken);
+			if(!authorized)	
 			{
 				statusLine = "HTTP 401 Unauthorized status" + CRLF;
 				statusLine += "WWW-Authenticate: Basic realm=\"User Visible Realm\"" + CRLF;
 				contentTypeLine = "";
 				entityBody = "";
+			}
+		}
+		
+		
+		//Checagem de diretorio
+		Boolean isDirectory = false;
+		File f = new File(fileName);
+		if (f.exists() && f.isDirectory() && authorized) {
+			if(WebServer.shouldListDirectoryContent == 3 ){
+				fileName += "/index.html";
+			}
+			else{
+				// FIXME - fiz uma versao paliativa so p testar...
+				statusLine = "HTTP/1.1 200 OK" + CRLF;
+				contentTypeLine = "Content-Type: text/html" + CRLF;
+				entityBody = "<HTML>" +
+					"<HEAD><TITLE>"+fileName+"</TITLE></HEAD>" +
+					"<BODY>";
+				
+				if( WebServer.shouldListDirectoryContent == 1 )
+				{
+					List<String> paths = WebServer.listFilesAndDirectories(fileName);
+					
+					for (String path : paths) {
+						entityBody += "<a href='"+ path +"'>"+ path + "</a><BR/>";
+					}
+				}
+				else{
+					entityBody += "<h1>Listagem de diretorio nao permitida</h1>";
+				}
+				
+				entityBody += "</BODY></HTML>" + CRLF;
+				
 				isDirectory = true;
 			}
 		}
@@ -162,7 +160,7 @@ public class HttpRequest implements Runnable {
 		// Abrir o arquivo requisitado.
 		FileInputStream fis = null;
 		Boolean fileExists = false;
-		if (!isDirectory) {
+		if (!isDirectory && authorized) {
 			try{
 				fis = new FileInputStream(fileName);
 				statusLine = "HTTP/1.1 200 OK" + CRLF;

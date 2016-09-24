@@ -105,7 +105,6 @@ public class WebServer {
 						break;
 					case "restricted_directory":
 						restrictedDirectories.add(values[1]);
-						System.out.println("Adding: " + values[1]);
 						break;
 					default:
 						System.out.println("Comando inválido! " + values[0]);
@@ -125,10 +124,14 @@ public class WebServer {
 	 * Verifica se diretorio e restrito
 	 * @return diretorio e restrito?
 	 */
-	public static boolean dirIsRestricted(String filename)
-	{
-		System.out.println("Testing: " + filename);
-		return restrictedDirectories.contains(filename);
+	public static boolean isRestricted(String filename)
+	{	
+		for(String path : restrictedDirectories)
+		{
+			if(filename.startsWith(path))
+				return true;
+		}
+		return false;
 	}
 	
 	/**
