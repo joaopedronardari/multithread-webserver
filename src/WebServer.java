@@ -70,7 +70,7 @@ public class WebServer {
 	/**
 	 * Metodo para fazer parsing do arquivo de configuracao
 	 */
-	static void readConfigFile(){
+	private static void readConfigFile(){
 		File cfg = new File(configFile);
 		
 		//Seta valores padrao
