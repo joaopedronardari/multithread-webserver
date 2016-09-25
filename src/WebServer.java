@@ -24,7 +24,7 @@ public class WebServer {
 		// Estabelecer o socket de escuta.
 		ServerSocket socket = new ServerSocket(port);
 		
-		// Lê arquivo de configuracao
+		// Le arquivo de configuracao
 		readConfigFile();
 
 		// Processar a requisicao de servico HTTP em um laco infinito.
@@ -84,7 +84,7 @@ public class WebServer {
 			while(in.hasNext()){
 				String line = in.nextLine();
 				
-				//Pula comentários
+				//Pula comentarios
 				if(line.startsWith("#"))
 					continue;
 				
@@ -107,16 +107,17 @@ public class WebServer {
 						restrictedDirectories.add(values[1]);
 						break;
 					default:
-						System.out.println("Comando inválido! " + values[0]);
+						System.out.println("Comando invalido! " + values[0]);
 					}
 				} else
 				{
-					System.out.println("Linha inválida de configuração! " + line);
+					System.out.println("Linha invalida de configuracao! " + line);
 				}	
 			}
 			
+			in.close();
 		} catch (FileNotFoundException e) {
-			System.out.println("Arquivo de configuração não encontrado!");
+			System.out.println("Arquivo de configuracao nao encontrado!");
 		}
 	}
 	

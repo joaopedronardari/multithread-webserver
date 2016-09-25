@@ -19,12 +19,18 @@ public class HttpRequest implements Runnable {
 
 	Socket socket;
 
-	// Construtor
+	/**
+	 * Contrutor da classe
+	 * @param socket - Socket aberto de conexao vindo da WebServer
+	 * @throws Exception
+	 */
 	public HttpRequest(Socket socket) throws Exception {
 		this.socket = socket;
 	}
 
-	// Implemente o metodo run() da interface Runnable.
+	/**
+	 * Implementa o metodo run() da interface Runnable.
+	 */
 	@Override
 	public void run() {
 		try {
@@ -34,7 +40,12 @@ public class HttpRequest implements Runnable {
 		}
 	}
 	
-	private String contentType( String filename )
+	/**
+	 * Metodo que retorna o ContentType para o determinado tipo de arquivo
+	 * @param filename - caminho para o arquivo
+	 * @return ContentType para o arquivo passado via parametro
+	 */
+	private String contentType(String filename)
 	{
 		if(filename.endsWith(".htm") || filename.endsWith(".html")) {
 			return "text/html";
@@ -48,19 +59,28 @@ public class HttpRequest implements Runnable {
 		return "application/octet-stream";
 	}
 	
-	private static void sendBytes(FileInputStream fis, OutputStream os)
+	/**
+	 * Metodo que copia o conteudo do arquivo para o OutputStream
+	 * @param fileInputStream - FileInputStream do arquivo para resposta
+	 * @param outputStream - OutputStream - objeto que sera utilizado na resposta
+	 * @throws Exception - para caso de problema na leitura do arquivo
+	 */
+	private static void sendBytes(FileInputStream fileInputStream, OutputStream outputStream)
 	throws Exception
 	{
 		// Construir um buffer de 1K para comportar os bytes no caminho para o socket.
 		byte[] buffer = new byte[1024];
 		int bytes = 0;
 		// Copiar o arquivo requisitado dentro da cadeia de saida do socket.
-		while((bytes = fis.read(buffer)) != -1 ) {
-			os.write(buffer, 0, bytes);
+		while((bytes = fileInputStream.read(buffer)) != -1 ) {
+			outputStream.write(buffer, 0, bytes);
 		}
 	}
 
-
+	/**
+	 * Metodo que processa a requisicao recebida
+	 * @throws Exception
+	 */
 	private void processRequest() throws Exception {
 		
 		// Obter uma referencia para os trechos de entrada e saida do socket.
@@ -107,7 +127,6 @@ public class HttpRequest implements Runnable {
 		String contentTypeLine = null;
 		String entityBody = null;
 		
-		
 		//Autenticacao
 		boolean authorized = true;
 		if(WebServer.isRestricted(fileName))
@@ -122,7 +141,6 @@ public class HttpRequest implements Runnable {
 			}
 		}
 		
-		
 		//Checagem de diretorio
 		Boolean isDirectory = false;
 		File f = new File(fileName);
@@ -131,7 +149,7 @@ public class HttpRequest implements Runnable {
 				fileName += "/index.html";
 			}
 			else{
-				// FIXME - fiz uma versao paliativa so p testar...
+				fileName = addPathSeparatorIfNeed(fileName);
 				statusLine = "HTTP/1.1 200 OK" + CRLF;
 				contentTypeLine = "Content-Type: text/html" + CRLF;
 				entityBody = "<HTML>" +
@@ -143,7 +161,7 @@ public class HttpRequest implements Runnable {
 					List<String> paths = WebServer.listFilesAndDirectories(fileName);
 					
 					for (String path : paths) {
-						entityBody += "<a href='"+ path +"'>"+ path + "</a><BR/>";
+						entityBody += "<a href='/"+ fileName + path +"'>"+ path + "</a><BR/>";
 					}
 				}
 				else{
@@ -155,7 +173,6 @@ public class HttpRequest implements Runnable {
 				isDirectory = true;
 			}
 		}
-		
 		
 		// Abrir o arquivo requisitado.
 		FileInputStream fis = null;
@@ -206,4 +223,15 @@ public class HttpRequest implements Runnable {
 		br.close();
 		socket.close();
 	}
+	
+	/**
+	 * Adiciona barra / caso necessario no caminho do diretorio
+	 * @param path - Caminho para o diretorio
+	 * @return String contendo o separador
+	 */
+	public static String addPathSeparatorIfNeed(String path) {
+		char separator = '/';
+		return path.charAt(path.length()-1) != separator ? path + separator : path;
+	}
+	
 }
